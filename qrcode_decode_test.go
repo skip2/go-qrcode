@@ -59,6 +59,11 @@ func TestDecodeBasic(t *testing.T) {
 			1,
 			Highest,
 		},
+		{
+			"01234567",
+			1,
+			Medium,
+		},
 	}
 
 	for _, test := range tests {

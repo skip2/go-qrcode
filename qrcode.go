@@ -101,6 +101,7 @@ type QRCode struct {
 
 	data   *bitset.Bitset
 	symbol *symbol
+	mask int
 }
 
 // New constructs a QRCode.
@@ -318,8 +319,11 @@ func (q *QRCode) encode(numTerminatorBits int) {
 
 		var p int = s.penaltyScore()
 
+		//log.Printf("mask=%d p=%3d p1=%3d p2=%3d p3=%3d p4=%d\n", mask, p, s.penalty1(), s.penalty2(), s.penalty3(), s.penalty4())
+
 		if q.symbol == nil || p < penalty {
 			q.symbol = s
+			q.mask = mask
 			penalty = p
 		}
 	}

@@ -136,9 +136,20 @@ func TestQRCodeVersionCapacity(t *testing.T) {
 	}
 }
 
-func BenchmarkQRCodeMinimumSize(b *testing.B) {
-	for n := 0; n < b.N; n++ {
-		New("1", Low)
+func TestQRCodeISOAnnexIExample(t *testing.T) {
+	var q *QRCode
+	q, err := New("01234567", Medium)
+
+	if err != nil {
+		t.Fatalf("Error producing ISO Annex I Example: %s, expected success",
+			err.Error())
+	}
+
+	const expectedMask int = 2
+
+	if q.mask != 2 {
+		t.Errorf("ISO Annex I example mask got %d, expected %d\n", q.mask,
+		expectedMask)
 	}
 }
 

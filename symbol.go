@@ -220,7 +220,7 @@ func (m *symbol) penalty3() int {
 	var penalty int = 0
 
 	for y := 0; y < m.symbolSize; y++ {
-		var bitBuffer int16 = 0xFF
+		var bitBuffer int16 = 0x00
 
 		for x := 0; x < m.symbolSize; x++ {
 			bitBuffer <<= 1
@@ -233,12 +233,18 @@ func (m *symbol) penalty3() int {
 			// 0x05d           or 0x5d0
 			case 0x05d, 0x5d0:
 				penalty += penaltyWeight3
+				bitBuffer = 0xFF
+			default:
+				if x == m.symbolSize - 1 && (bitBuffer & 0x7f) == 0x5d {
+					penalty += penaltyWeight3
+					bitBuffer = 0xFF
+				}
 			}
 		}
 	}
 
 	for x := 0; x < m.symbolSize; x++ {
-		var bitBuffer int16 = 0xFF
+		var bitBuffer int16 = 0x00
 
 		for y := 0; y < m.symbolSize; y++ {
 			bitBuffer <<= 1
@@ -251,6 +257,12 @@ func (m *symbol) penalty3() int {
 			// 0x05d           or 0x5d0
 			case 0x05d, 0x5d0:
 				penalty += penaltyWeight3
+				bitBuffer = 0xFF
+			default:
+				if y == m.symbolSize - 1 && (bitBuffer & 0x7f) == 0x5d {
+					penalty += penaltyWeight3
+					bitBuffer = 0xFF
+				}
 			}
 		}
 	}
