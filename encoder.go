@@ -31,10 +31,10 @@ import (
 // represented in all three modes, whereas alphanumeric data (e.g. 'A') can be
 // represented in alphanumeric and byte mode.
 //
-// The cost to start a new segment (to use a different Data Mode) has a cost,
-// the bits to state the new segment Data Mode and length. To minimise each QR
-// Code's symbol size, an optimisation routine coalesces segment types
-// where possible, to reduce the encoded data length.
+// Starting a new segment (to use a different Data Mode) has a cost, the bits to
+// state the new segment Data Mode and length. To minimise each QR Code's symbol
+// size, an optimisation routine coalesces segment types where possible, to
+// reduce the encoded data length.
 //
 // There are several other data modes available (e.g. Kanji mode) which are not
 // implemented here.
