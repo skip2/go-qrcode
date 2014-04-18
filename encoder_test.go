@@ -144,7 +144,6 @@ type testModeSegment struct {
 }
 
 func TestOptimiseEncoding(t *testing.T) {
-
 	tests := []struct {
 		dataEncoderType dataEncoderType
 		actual          []testModeSegment
@@ -219,6 +218,22 @@ func TestOptimiseEncoding(t *testing.T) {
 			},
 			[]testModeSegment{
 				{dataModeAlphanumeric, 26},
+			},
+		},
+		{
+			dataEncoderType27To40,
+			[]testModeSegment{
+				{dataModeByte, 1},
+				{dataModeNumeric, 1},
+				{dataModeByte, 1},
+				{dataModeNumeric, 1},
+				{dataModeByte, 1},
+				{dataModeNumeric, 1},
+				{dataModeByte, 1},
+				{dataModeNumeric, 1},
+			},
+			[]testModeSegment{
+				{dataModeByte, 8},
 			},
 		},
 	}

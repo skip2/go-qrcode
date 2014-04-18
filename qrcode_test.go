@@ -14,37 +14,43 @@ func TestQRCodeMaxCapacity(t *testing.T) {
 	}
 
 	tests := []struct {
-		char     byte
-		maxChars int
+		string string
+		numRepetitions int
 	}{
 		{
-			'0',
+			"0",
 			7089,
 		},
 		{
-			'A',
+			"A",
 			4296,
 		},
 		{
-			'#',
+			"#",
 			2953,
+		},
+		// Alternate byte/numeric data types. Optimises to 2,952 bytes.
+		{
+			"#1",
+			1476,
 		},
 	}
 
 	for _, test := range tests {
-		_, err := New(strings.Repeat(string(test.char), test.maxChars), Low)
+		_, err := New(strings.Repeat(test.string, test.numRepetitions), Low)
 
 		if err != nil {
-			t.Errorf("%d x '%c' got %s expected success", test.maxChars, test.char, err.Error())
+			t.Errorf("%d x '%s' got %s expected success", test.numRepetitions,
+				test.string, err.Error())
 		}
 	}
 
 	for _, test := range tests {
-		_, err := New(strings.Repeat(string(test.char), test.maxChars+1), Low)
+		_, err := New(strings.Repeat(test.string, test.numRepetitions+1), Low)
 
 		if err == nil {
-			t.Errorf("%d x '%c' chars encodable, expected not encodable",
-				test.maxChars+1, test.char)
+			t.Errorf("%d x '%s' chars encodable, expected not encodable",
+				test.numRepetitions+1, test.string)
 		}
 	}
 }
