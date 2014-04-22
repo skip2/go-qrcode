@@ -75,7 +75,7 @@ func TestGFPolyequals(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		var isEqual bool = test.a.equals(test.b)
+		isEqual := test.a.equals(test.b)
 
 		if isEqual != test.isEqual {
 			t.Errorf("%s and %s equality is %t (got %t)\n", test.a.string(false), test.b.string(false),

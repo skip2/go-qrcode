@@ -1,7 +1,7 @@
 // go-qrcode
 // Copyright 2014 Tom Harwood
 
-// Reed-Solomon error correction for QR Code 2005.
+// Package reedsolomon provides error correction encoding for QR Code 2005.
 //
 // QR Code 2005 uses a Reed-Solomon error correcting code to detect and correct
 // errors encountered during decoding.

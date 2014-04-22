@@ -73,10 +73,10 @@ func TestEncode(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		var data *bitset.Bitset = bitset.NewFromBase2String(test.data)
-		var rsCode *bitset.Bitset = bitset.NewFromBase2String(test.rsCode)
+		data := bitset.NewFromBase2String(test.data)
+		rsCode := bitset.NewFromBase2String(test.rsCode)
 
-		var result *bitset.Bitset = Encode(data, test.numECBytes)
+		result := Encode(data, test.numECBytes)
 
 		if !rsCode.Equals(result) {
 			t.Errorf("data=%s, numECBytes=%d, encoded=%s, want %s",

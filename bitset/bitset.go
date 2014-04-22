@@ -250,7 +250,7 @@ func (b *Bitset) ByteAt(index int) byte {
 		log.Panicf("Index %d out of range", index)
 	}
 
-	var result byte = 0
+	var result byte
 
 	for i := index; i < index+8 && i < b.numBits; i++ {
 		result <<= 1
