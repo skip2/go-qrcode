@@ -106,7 +106,7 @@ var (
 
 func buildRegularSymbol(version qrCodeVersion, mask int,
 	data *bitset.Bitset) (*symbol, error) {
-	var m *regularSymbol = &regularSymbol{
+	m := &regularSymbol{
 		version: version,
 		mask:    mask,
 		data:    data,
@@ -130,10 +130,10 @@ func buildRegularSymbol(version qrCodeVersion, mask int,
 }
 
 func (m *regularSymbol) addFinderPatterns() {
-	var fpSize int = finderPatternSize
-	var fp [][]bool = finderPattern
-	var fpHBorder [][]bool = finderPatternHorizontalBorder
-	var fpVBorder [][]bool = finderPatternVerticalBorder
+	fpSize := finderPatternSize
+	fp := finderPattern
+	fpHBorder := finderPatternHorizontalBorder
+	fpVBorder := finderPatternVerticalBorder
 
 	// Top left Finder Pattern.
 	m.symbol.set2dPattern(0, 0, fp)
@@ -164,7 +164,7 @@ func (m *regularSymbol) addAlignmentPatterns() {
 }
 
 func (m *regularSymbol) addTimingPatterns() {
-	var value bool = true
+	value := true
 
 	for i := finderPatternSize + 1; i < m.size-finderPatternSize; i++ {
 		m.symbol.set(i, finderPatternSize-1, value)
@@ -175,10 +175,10 @@ func (m *regularSymbol) addTimingPatterns() {
 }
 
 func (m *regularSymbol) addFormatInfo() {
-	var fpSize int = finderPatternSize
-	var l int = formatInfoLengthBits - 1
+	fpSize := finderPatternSize
+	l := formatInfoLengthBits - 1
 
-	var f *bitset.Bitset = m.version.formatInfo(m.mask)
+	f := m.version.formatInfo(m.mask)
 
 	// Bits 0-7, under the top right finder pattern.
 	for i := 0; i <= 7; i++ {
@@ -210,10 +210,10 @@ func (m *regularSymbol) addFormatInfo() {
 }
 
 func (m *regularSymbol) addVersionInfo() {
-	var fpSize int = finderPatternSize
+	fpSize := finderPatternSize
 
-	var v *bitset.Bitset = m.version.versionInfo()
-	var l int = versionInfoLengthBits - 1
+	v := m.version.versionInfo()
+	l := versionInfoLengthBits - 1
 
 	if v == nil {
 		return
@@ -236,11 +236,11 @@ const (
 )
 
 func (m *regularSymbol) addData() (bool, error) {
-	var xOffset int = 1
-	var dir direction = up
+	xOffset := 1
+	dir := up
 
-	var x int = m.size - 2
-	var y int = m.size - 1
+	x := m.size - 2
+	y := m.size - 1
 
 	for i := 0; i < m.data.Len(); i++ {
 		var mask bool

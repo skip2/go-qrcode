@@ -137,10 +137,10 @@ func New(content string, level RecoveryLevel) (*QRCode, error) {
 	if err != nil {
 		return nil, err
 	} else if chosenVersion == nil {
-		return nil, errors.New("Content too long to encode")
+		return nil, errors.New("content too long to encode")
 	}
 
-	var q *QRCode = &QRCode{
+	q := &QRCode{
 		Content: content,
 
 		Level:         level,
@@ -180,13 +180,13 @@ func newWithForcedVersion(content string, version int, level RecoveryLevel) (*QR
 		return nil, err
 	}
 
-	var chosenVersion *qrCodeVersion = getQRCodeVersion(level, version)
+	chosenVersion := getQRCodeVersion(level, version)
 
 	if chosenVersion == nil {
-		return nil, errors.New("Cannot find QR Code version")
+		return nil, errors.New("cannot find QR Code version")
 	}
 
-	var q *QRCode = &QRCode{
+	q := &QRCode{
 		Content: content,
 
 		Level:         level,
@@ -234,9 +234,8 @@ func (q *QRCode) Image(size int) image.Image {
 	// Center the symbol within the image.
 	offset := (size - realSize*pixelsPerModule) / 2
 
-	var rect image.Rectangle = image.Rectangle{Min: image.Point{0, 0}, Max: image.Point{size, size}}
-
-	var img *image.RGBA = image.NewRGBA(rect)
+	rect := image.Rectangle{Min: image.Point{0, 0}, Max: image.Point{size, size}}
+	img := image.NewRGBA(rect)
 
 	for i := 0; i < size; i++ {
 		for j := 0; j < size; j++ {
@@ -244,7 +243,7 @@ func (q *QRCode) Image(size int) image.Image {
 		}
 	}
 
-	var bitmap [][]bool = q.symbol.bitmap()
+	bitmap := q.symbol.bitmap()
 	for y, row := range bitmap {
 		for x, v := range row {
 			if v {
@@ -267,7 +266,7 @@ func (q *QRCode) Image(size int) image.Image {
 // size is both the image width and height in pixels. If size is too small then
 // a larger image is silently returned.
 func (q *QRCode) PNG(size int) ([]byte, error) {
-	var img image.Image = q.Image(size)
+	img := q.Image(size)
 
 	var b bytes.Buffer
 	err := png.Encode(&b, img)
@@ -302,10 +301,10 @@ func (q *QRCode) encode(numTerminatorBits int) {
 	q.addTerminatorBits(numTerminatorBits)
 	q.addPadding()
 
-	var encoded *bitset.Bitset = q.encodeBlocks()
+	encoded := q.encodeBlocks()
 
-	var numMasks int = 8
-	var penalty int = 0
+	const numMasks int = 8
+	penalty := 0
 
 	for mask := 0; mask < numMasks; mask++ {
 		var s *symbol
@@ -317,7 +316,7 @@ func (q *QRCode) encode(numTerminatorBits int) {
 			log.Panic(err.Error())
 		}
 
-		var p int = s.penaltyScore()
+		p := s.penaltyScore()
 
 		//log.Printf("mask=%d p=%3d p1=%3d p2=%3d p3=%3d p4=%d\n", mask, p, s.penalty1(), s.penalty2(), s.penalty3(), s.penalty4())
 
@@ -351,18 +350,19 @@ func (q *QRCode) encodeBlocks() *bitset.Bitset {
 		ecStartOffset int
 	}
 
-	var block []dataBlock = make([]dataBlock, q.version.numBlocks())
+	block := make([]dataBlock, q.version.numBlocks())
 
-	var start int = 0
-	var end int = 0
-	var blockID int = 0
+	start := 0
+	end := 0
+	blockID := 0
+
 	for _, b := range q.version.block {
 		for j := 0; j < b.numBlocks; j++ {
 			start = end
 			end = start + b.numDataCodewords*8
 
 			// Apply error correction to each block.
-			var numErrorCodewords int = b.numCodewords - b.numDataCodewords
+			numErrorCodewords := b.numCodewords - b.numDataCodewords
 			block[blockID].data = reedsolomon.Encode(q.data.Substr(start, end), numErrorCodewords)
 			block[blockID].ecStartOffset = end - start
 
@@ -380,7 +380,7 @@ func (q *QRCode) encodeBlocks() *bitset.Bitset {
 	result := bitset.New()
 
 	// Combine data blocks.
-	var working bool = true
+	working := true
 	for i := 0; working; i += 8 {
 		working = false
 
@@ -401,7 +401,7 @@ func (q *QRCode) encodeBlocks() *bitset.Bitset {
 		working = false
 
 		for j, b := range block {
-			var offset int = i + block[j].ecStartOffset
+			offset := i + block[j].ecStartOffset
 			if offset >= block[j].data.Len() {
 				continue
 			}
@@ -422,9 +422,9 @@ func (q *QRCode) encodeBlocks() *bitset.Bitset {
 func max(a int, b int) int {
 	if a > b {
 		return a
-	} else {
-		return b
 	}
+
+	return b
 }
 
 // addPadding pads the encoded data upto the full length required.
@@ -439,7 +439,7 @@ func (q *QRCode) addPadding() {
 	q.data.AppendNumBools(q.version.numBitsToPadToCodeword(q.data.Len()), false)
 
 	// Pad codewords 0b11101100 and 0b00010001.
-	var padding [2]*bitset.Bitset = [2]*bitset.Bitset{
+	padding := [2]*bitset.Bitset{
 		bitset.New(true, true, true, false, true, true, false, false),
 		bitset.New(false, false, false, true, false, false, false, true),
 	}

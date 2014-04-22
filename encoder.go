@@ -116,7 +116,7 @@ type dataEncoder struct {
 
 // newDataEncoder constructs a dataEncoder.
 func newDataEncoder(t dataEncoderType) *dataEncoder {
-	var d *dataEncoder = &dataEncoder{}
+	d := &dataEncoder{}
 
 	switch t {
 	case dataEncoderType1To9:
@@ -168,7 +168,7 @@ func (d *dataEncoder) encode(data []byte) (*bitset.Bitset, error) {
 	d.optimised = nil
 
 	if len(data) == 0 {
-		return nil, errors.New("No data to encode")
+		return nil, errors.New("no data to encode")
 	}
 
 	// Classify data into unoptimised segments.
@@ -181,7 +181,7 @@ func (d *dataEncoder) encode(data []byte) (*bitset.Bitset, error) {
 	}
 
 	// Encode data.
-	var encoded *bitset.Bitset = bitset.New()
+	encoded := bitset.New()
 	for _, s := range d.optimised {
 		d.encodeDataRaw(s.data, s.dataMode, encoded)
 	}
@@ -193,8 +193,8 @@ func (d *dataEncoder) encode(data []byte) (*bitset.Bitset, error) {
 // e.g. "123ZZ#!#!" =>
 // [numeric, 3, "123"] [alphanumeric, 2, "ZZ"] [byte, 4, "#!#!"].
 func (d *dataEncoder) classifyDataModes() {
-	var start int = 0
-	var mode dataMode = dataModeNone
+	var start int
+	mode := dataModeNone
 
 	for i, v := range d.data {
 		newMode := dataModeNone
@@ -271,7 +271,7 @@ func (d *dataEncoder) optimiseDataModes() error {
 			}
 		}
 
-		var optimised segment = segment{dataMode: mode,
+		optimised := segment{dataMode: mode,
 			data: make([]byte, 0, numChars)}
 
 		for k := i; k < j; k++ {
@@ -289,8 +289,8 @@ func (d *dataEncoder) optimiseDataModes() error {
 // encodeDataRaw encodes data in dataMode. The encoded data is appended to
 // encoded.
 func (d *dataEncoder) encodeDataRaw(data []byte, dataMode dataMode, encoded *bitset.Bitset) {
-	var modeIndicator *bitset.Bitset = d.modeIndicator(dataMode)
-	var charCountBits int = d.charCountBits(dataMode)
+	modeIndicator := d.modeIndicator(dataMode)
+	charCountBits := d.charCountBits(dataMode)
 
 	// Append mode indicator.
 	encoded.Append(modeIndicator)
@@ -304,8 +304,9 @@ func (d *dataEncoder) encodeDataRaw(data []byte, dataMode dataMode, encoded *bit
 		for i := 0; i < len(data); i += 3 {
 			charsRemaining := len(data) - i
 
-			var value uint32 = 0
-			var bitsUsed int = 1
+			var value uint32
+			bitsUsed := 1
+
 			for j := 0; j < charsRemaining && j < 3; j++ {
 				value *= 10
 				value += uint32(data[i+j] - 0x30)
@@ -317,13 +318,13 @@ func (d *dataEncoder) encodeDataRaw(data []byte, dataMode dataMode, encoded *bit
 		for i := 0; i < len(data); i += 2 {
 			charsRemaining := len(data) - i
 
-			var value uint32 = 0
+			var value uint32
 			for j := 0; j < charsRemaining && j < 2; j++ {
 				value *= 45
 				value += encodeAlphanumericCharacter(data[i+j])
 			}
 
-			var bitsUsed int = 6
+			bitsUsed := 6
 			if charsRemaining > 1 {
 				bitsUsed = 11
 			}
@@ -382,20 +383,20 @@ func (d *dataEncoder) charCountBits(dataMode dataMode) int {
 // An error is returned if the mode is not supported, or the length requested is
 // too long to be represented.
 func (d *dataEncoder) encodedLength(dataMode dataMode, n int) (int, error) {
-	var modeIndicator *bitset.Bitset = d.modeIndicator(dataMode)
-	var charCountBits int = d.charCountBits(dataMode)
+	modeIndicator := d.modeIndicator(dataMode)
+	charCountBits := d.charCountBits(dataMode)
 
 	if modeIndicator == nil {
-		return 0, errors.New("Mode not supported")
+		return 0, errors.New("mode not supported")
 	}
 
 	maxLength := (1 << uint8(charCountBits)) - 1
 
 	if n > maxLength {
-		return 0, errors.New("Length too long to be represented")
+		return 0, errors.New("length too long to be represented")
 	}
 
-	var length int = modeIndicator.Len() + charCountBits
+	length := modeIndicator.Len() + charCountBits
 
 	switch dataMode {
 	case dataModeNumeric:

@@ -6,10 +6,10 @@ package qrcode
 import "testing"
 
 func TestSymbolBasic(t *testing.T) {
-	var size int = 10
-	var quietZoneSize int = 4
+	size := 10
+	quietZoneSize := 4
 
-	var m *symbol = newSymbol(size, quietZoneSize)
+	m := newSymbol(size, quietZoneSize)
 
 	if m.size != size+quietZoneSize*2 {
 		t.Errorf("Symbol size is %d, expected %d", m.size, size+quietZoneSize*2)
@@ -28,7 +28,7 @@ func TestSymbolBasic(t *testing.T) {
 				t.Errorf("New symbol is not empty")
 			}
 
-			var value bool = i*j%2 == 0
+			value := i*j%2 == 0
 			m.set(i, j, value)
 
 			v = m.get(i, j)
@@ -302,7 +302,7 @@ func TestSymbolPenalties(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		var s *symbol = newSymbol(len(test.pattern[0]), 4)
+		s := newSymbol(len(test.pattern[0]), 4)
 		s.set2dPattern(0, 0, test.pattern)
 
 		penalty1 := s.penalty1()
@@ -310,7 +310,8 @@ func TestSymbolPenalties(t *testing.T) {
 		penalty3 := s.penalty3()
 		penalty4 := s.penalty4()
 
-		var ok bool = true
+		ok := true
+
 		if test.expectedPenalty1 != -1 && test.expectedPenalty1 != penalty1 {
 			ok = false
 		}

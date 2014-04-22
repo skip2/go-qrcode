@@ -142,13 +142,13 @@ func TestDecodeFuzz(t *testing.T) {
 		t.Skip("Decode fuzz tests not enabled")
 	}
 
-	var r *rand.Rand = rand.New(rand.NewSource(0))
+	r := rand.New(rand.NewSource(0))
 
-	const kIterations int = 32
-	const kMaxLength int = 128
+	const iterations int = 32
+	const maxLength int = 128
 
-	for i := 0; i < kIterations; i++ {
-		len := r.Intn(kMaxLength-1) + 1
+	for i := 0; i < iterations; i++ {
+		len := r.Intn(maxLength-1) + 1
 
 		var content string
 		for j := 0; j < len; j++ {
@@ -179,7 +179,7 @@ func zbarimgCheck(q *QRCode) error {
 
 	if s != q.Content {
 		q.WriteFile(256, fmt.Sprintf("%x.png", q.Content))
-		return fmt.Errorf("Got '%s' (%x) expected '%s' (%x)", s, s, q.Content, q.Content)
+		return fmt.Errorf("got '%s' (%x) expected '%s' (%x)", s, s, q.Content, q.Content)
 	}
 
 	return nil
@@ -194,7 +194,7 @@ func zbarimgDecode(q *QRCode) (string, error) {
 		return "", err
 	}
 
-	var cmd *exec.Cmd = exec.Command("zbarimg", "--quiet", "-Sdisable",
+	cmd := exec.Command("zbarimg", "--quiet", "-Sdisable",
 		"-Sqrcode.enable", "/dev/stdin")
 
 	var out bytes.Buffer

@@ -70,7 +70,7 @@ func TestByteModeLengthCalculations(t *testing.T) {
 	}{}
 
 	for i, test := range tests {
-		var encoder *dataEncoder = newDataEncoder(test.dataEncoderType)
+		encoder := newDataEncoder(test.dataEncoderType)
 		var resultLength int
 
 		resultLength, err := encoder.encodedLength(test.dataMode, test.numSymbols)
@@ -126,9 +126,9 @@ func TestSingleModeEncodings(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		var encoder *dataEncoder = newDataEncoder(test.dataEncoderType)
+		encoder := newDataEncoder(test.dataEncoderType)
+		encoded := bitset.New()
 
-		var encoded *bitset.Bitset = bitset.New()
 		encoder.encodeDataRaw([]byte(test.data), test.dataMode, encoded)
 
 		if !test.expected.Equals(encoded) {
@@ -244,9 +244,9 @@ func TestOptimiseEncoding(t *testing.T) {
 			numTotalChars += v.numChars
 		}
 
-		var data []byte = make([]byte, numTotalChars)
+		data := make([]byte, numTotalChars)
 
-		var i int = 0
+		i := 0
 		for _, v := range test.actual {
 			for j := 0; j < v.numChars; j++ {
 				switch v.dataMode {
@@ -264,14 +264,14 @@ func TestOptimiseEncoding(t *testing.T) {
 			}
 		}
 
-		var encoder *dataEncoder = newDataEncoder(test.dataEncoderType)
+		encoder := newDataEncoder(test.dataEncoderType)
 
 		_, err := encoder.encode(data)
 
 		if err != nil {
 			t.Errorf("Got %s, expected valid encoding", err.Error())
 		} else {
-			var ok bool = true
+			ok := true
 
 			if len(encoder.optimised) != len(test.optimised) {
 				ok = false
@@ -294,7 +294,8 @@ func TestOptimiseEncoding(t *testing.T) {
 }
 
 func testModeSegmentsString(segments []testModeSegment) string {
-	var result string = "["
+	result := "["
+
 	for i, segment := range segments {
 		if i > 0 {
 			result += ", "
@@ -310,7 +311,8 @@ func testModeSegmentsString(segments []testModeSegment) string {
 }
 
 func segmentsString(segments []segment) string {
-	var result string = "["
+	result := "["
+
 	for i, segment := range segments {
 		if i > 0 {
 			result += ", "

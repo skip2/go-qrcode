@@ -2965,7 +2965,7 @@ func (v qrCodeVersion) numDataBits() int {
 //
 // On success the chosen QR Code version is returned.
 func chooseQRCodeVersion(level RecoveryLevel, encoder *dataEncoder, numDataBits int) *qrCodeVersion {
-	var chosenVersion *qrCodeVersion = nil
+	var chosenVersion *qrCodeVersion
 
 	for _, v := range versions {
 		if v.level != level {

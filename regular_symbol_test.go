@@ -12,10 +12,9 @@ import (
 
 func TestBuildRegularSymbol(t *testing.T) {
 	for k := 0; k <= 7; k++ {
-		var v *qrCodeVersion = getQRCodeVersion(Low, 1)
-		var s *symbol
+		v := getQRCodeVersion(Low, 1)
 
-		var data *bitset.Bitset = bitset.New()
+		data := bitset.New()
 		for i := 0; i < 26; i++ {
 			data.AppendNumBools(8, false)
 		}

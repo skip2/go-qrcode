@@ -54,7 +54,7 @@ func TestFormatInfo(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		var v *qrCodeVersion = getQRCodeVersion(test.level, 1)
+		v := getQRCodeVersion(test.level, 1)
 
 		result := v.formatInfo(test.maskPattern)
 

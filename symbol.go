@@ -90,9 +90,9 @@ func (m *symbol) set2dPattern(x int, y int, v [][]bool) {
 
 // bitmap returns the entire symbol, including the quiet zone.
 func (m *symbol) bitmap() [][]bool {
-	var module [][]bool = make([][]bool, len(m.module))
+	module := make([][]bool, len(m.module))
 
-	for i, _ := range m.module {
+	for i := range m.module {
 		module[i] = m.module[i][:]
 	}
 
@@ -142,7 +142,7 @@ func (m *symbol) penaltyScore() int {
 // 0-5: score = 0
 // 6+ : score = penaltyWeight1 + (numAdjacentModules - 5)
 func (m *symbol) penalty1() int {
-	var penalty int = 0
+	penalty := 0
 
 	for x := 0; x < m.symbolSize; x++ {
 		lastValue := m.get(x, 0)
@@ -159,7 +159,7 @@ func (m *symbol) penalty1() int {
 				if count == 6 {
 					penalty += penaltyWeight1 + 1
 				} else if count > 6 {
-					penalty += 1
+					penalty++
 				}
 			}
 		}
@@ -180,7 +180,7 @@ func (m *symbol) penalty1() int {
 				if count == 6 {
 					penalty += penaltyWeight1 + 1
 				} else if count > 6 {
-					penalty += 1
+					penalty++
 				}
 			}
 		}
@@ -193,7 +193,7 @@ func (m *symbol) penalty1() int {
 //
 // m*n: score = penaltyWeight2 * (m-1) * (n-1).
 func (m *symbol) penalty2() int {
-	var penalty int = 0
+	penalty := 0
 
 	for y := 1; y < m.symbolSize; y++ {
 		for x := 1; x < m.symbolSize; x++ {
@@ -217,7 +217,7 @@ func (m *symbol) penalty2() int {
 //
 // Existence of the pattern scores penaltyWeight3.
 func (m *symbol) penalty3() int {
-	var penalty int = 0
+	penalty := 0
 
 	for y := 0; y < m.symbolSize; y++ {
 		var bitBuffer int16 = 0x00
@@ -272,8 +272,8 @@ func (m *symbol) penalty3() int {
 
 // penalty4 returns the penalty score...
 func (m *symbol) penalty4() int {
-	var numModules int = m.symbolSize * m.symbolSize
-	var numDarkModules int = 0
+	numModules := m.symbolSize * m.symbolSize
+	numDarkModules := 0
 
 	for x := 0; x < m.symbolSize; x++ {
 		for y := 0; y < m.symbolSize; y++ {
@@ -283,7 +283,7 @@ func (m *symbol) penalty4() int {
 		}
 	}
 
-	var numDarkModuleDeviation int = numModules/2 - numDarkModules
+	numDarkModuleDeviation := numModules/2 - numDarkModules
 	if numDarkModuleDeviation < 0 {
 		numDarkModuleDeviation *= -1
 	}
