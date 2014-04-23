@@ -15,7 +15,7 @@ func ExampleEncode() {
 	if err != nil {
 		fmt.Printf("Error: %s", err.Error())
 	} else {
-		fmt.Println("PNG is %d bytes long", len(png))
+		fmt.Printf("PNG is %d bytes long", len(png))
 	}
 }
 

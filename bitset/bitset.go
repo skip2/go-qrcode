@@ -47,10 +47,12 @@ func New(v ...bool) *Bitset {
 	return b
 }
 
+// Clone returns a copy.
 func Clone(from *Bitset) *Bitset {
 	return &Bitset{numBits: from.numBits, bits: from.bits[:]}
 }
 
+// Substr returns a substring, consisting of the bits from indexes start to end.
 func (b *Bitset) Substr(start int, end int) *Bitset {
 	if start > end || end > b.numBits {
 		log.Panicf("Out of range start=%d end=%d numBits=%d", start, end, b.numBits)
@@ -69,6 +71,12 @@ func (b *Bitset) Substr(start int, end int) *Bitset {
 	return result
 }
 
+// NewFromBase2String constructs and returns a Bitset from a string. The string
+// consists of '1', '0' or ' ' characters, e.g. "1010 0101". The '1' and '0'
+// characters represent true/false bits respectively, and ' ' characters are
+// ignored.
+//
+// The function panics if the input string contains other characters.
 func NewFromBase2String(b2string string) *Bitset {
 	b := &Bitset{numBits: 0, bits: make([]byte, 0)}
 
@@ -94,8 +102,8 @@ func (b *Bitset) AppendBytes(data []byte) {
 	}
 }
 
-// AppendBytes appends the |numBits| least significant bits from |byte|.
-func (b *Bitset) AppendByte(bits byte, numBits int) {
+// AppendByte appends the numBits least significant bits from value.
+func (b *Bitset) AppendByte(value byte, numBits int) {
 	b.ensureCapacity(numBits)
 
 	if numBits > 8 {
@@ -103,7 +111,7 @@ func (b *Bitset) AppendByte(bits byte, numBits int) {
 	}
 
 	for i := numBits - 1; i >= 0; i-- {
-		if bits&(1<<uint(i)) != 0 {
+		if value&(1<<uint(i)) != 0 {
 			b.bits[b.numBits/8] |= 0x80 >> uint(b.numBits%8)
 		}
 
@@ -111,7 +119,7 @@ func (b *Bitset) AppendByte(bits byte, numBits int) {
 	}
 }
 
-// AppendValue appends the |numBits| least significant bits from |value|.
+// AppendUint32 appends the numBits least significant bits from value.
 func (b *Bitset) AppendUint32(value uint32, numBits int) {
 	b.ensureCapacity(numBits)
 
@@ -173,7 +181,7 @@ func (b *Bitset) AppendBools(bits ...bool) {
 	}
 }
 
-// AppendBools appends bits to the Bitset.
+// AppendNumBools appends num bits of value value.
 func (b *Bitset) AppendNumBools(num int, value bool) {
 	for i := 0; i < num; i++ {
 		b.AppendBools(value)
@@ -224,6 +232,7 @@ func (b *Bitset) At(index int) bool {
 	return (b.bits[index/8] & (0x80 >> byte(index%8))) != 0
 }
 
+// Equals returns true if the Bitset equals other.
 func (b *Bitset) Equals(other *Bitset) bool {
 	if b.numBits != other.numBits {
 		return false
@@ -245,8 +254,9 @@ func (b *Bitset) Equals(other *Bitset) bool {
 	return true
 }
 
+// ByteAt returns a byte consisting of upto 8 bits starting at index.
 func (b *Bitset) ByteAt(index int) byte {
-	if index >= b.numBits {
+	if index < 0 || index >= b.numBits {
 		log.Panicf("Index %d out of range", index)
 	}
 
