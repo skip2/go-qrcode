@@ -152,8 +152,9 @@ func TestDecodeFuzz(t *testing.T) {
 
 		var content string
 		for j := 0; j < len; j++ {
-			// zbarimg has trouble with null bytes, hence start from ASCII 1.
-			content += string(1+r.Intn(254))
+			// zbarimg seems to have trouble with special characters, test printable
+			// characters only for now.
+			content += string(32+r.Intn(94))
 		}
 
 		for _, level := range []RecoveryLevel{Low, Medium, High, Highest} {

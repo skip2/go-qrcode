@@ -316,6 +316,12 @@ func (q *QRCode) encode(numTerminatorBits int) {
 			log.Panic(err.Error())
 		}
 
+		numEmptyModules := s.numEmptyModules()
+		if numEmptyModules != 0 {
+			log.Panicf("bug: numEmptyModules is %d (expected 0) (version=%d)",
+				numEmptyModules, q.VersionNumber)
+		}
+
 		p := s.penaltyScore()
 
 		//log.Printf("mask=%d p=%3d p1=%3d p2=%3d p3=%3d p4=%d\n", mask, p, s.penalty1(), s.penalty2(), s.penalty3(), s.penalty4())
@@ -371,11 +377,6 @@ func (q *QRCode) encodeBlocks() *bitset.Bitset {
 	}
 
 	// Interleave the blocks.
-
-	// A single block doesn't need interleaving.
-	if len(block) == 1 {
-		return block[0].data
-	}
 
 	result := bitset.New()
 
