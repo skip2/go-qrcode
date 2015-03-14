@@ -28,7 +28,7 @@ alphanumeric characters, 7,089 numeric digits, or a combination of these.<br>
 <br>
 <h1>Documentation</h1>
 
-<a href='https://godoc.org/code.google.com/p/go-qrcode'><img src='https://godoc.org/github.com/skip2/go-qrcode?status.png' /></a>
+<a href='https://godoc.org/github.com/skip2/go-qrcode'><img src='https://godoc.org/github.com/skip2/go-qrcode?status.png' /></a>
 
 <h1>Demoapp</h1>
 <a href='http://go-qrcode.appspot.com'>http://go-qrcode.appspot.com</a>
