@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"testing"
 
-	bitset "code.google.com/p/go-qrcode/bitset"
+	bitset "github.com/skip2/go-qrcode/bitset"
 )
 
 func TestBuildRegularSymbol(t *testing.T) {

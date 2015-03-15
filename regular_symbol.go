@@ -4,7 +4,7 @@
 package qrcode
 
 import (
-	bitset "code.google.com/p/go-qrcode/bitset"
+	bitset "github.com/skip2/go-qrcode/bitset"
 )
 
 type regularSymbol struct {
