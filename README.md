@@ -2,14 +2,15 @@
 
 <img src='https://skip.org/img/nyancat-youtube-qr.png' align='right'>
 
-Package qrcode implements a QR Code encoder.<br>
+Package qrcode implements a QR Code encoder. [![Build Status](https://travis-ci.org/skip2/go-qrcode.svg?branch=master)](https://travis-ci.org/skip2/go-qrcode) <br>
+
 <br>
 A QR Code is a matrix (two-dimensional) barcode. Arbitrary content may be encoded, with URLs being a popular choice :)<br>
 <br>
 Each QR Code contains error recovery information to aid reading damaged or obscured codes. There are four levels of error recovery: Low, medium, high and highest. QR Codes with a higher recovery level are more robust to damage, at the cost of being physically larger.<br>
 <br>
 <h1>Usage</h1>
-<pre>import qrcode "skip.org/go/qrcode"
+<pre>import qrcode "github.com/skip2/go-qrcode"
 </pre>
 
 <ul><li><b>Create a PNG image:</b><pre>var png []byte
