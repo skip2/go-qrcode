@@ -14,7 +14,7 @@ func TestQRCodeMaxCapacity(t *testing.T) {
 	}
 
 	tests := []struct {
-		string string
+		string         string
 		numRepetitions int
 	}{
 		{
@@ -155,7 +155,7 @@ func TestQRCodeISOAnnexIExample(t *testing.T) {
 
 	if q.mask != 2 {
 		t.Errorf("ISO Annex I example mask got %d, expected %d\n", q.mask,
-		expectedMask)
+			expectedMask)
 	}
 }
 

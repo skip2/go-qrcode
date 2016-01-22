@@ -154,7 +154,7 @@ func TestDecodeFuzz(t *testing.T) {
 		for j := 0; j < len; j++ {
 			// zbarimg seems to have trouble with special characters, test printable
 			// characters only for now.
-			content += string(32+r.Intn(94))
+			content += string(32 + r.Intn(94))
 		}
 
 		for _, level := range []RecoveryLevel{Low, Medium, High, Highest} {
@@ -230,4 +230,3 @@ func BenchmarkDecodeTest(b *testing.B) {
 		}
 	}
 }
-
