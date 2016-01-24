@@ -81,7 +81,7 @@ func (m *symbol) numEmptyModules() int {
 	var count int
 	for y := 0; y < m.symbolSize; y++ {
 		for x := 0; x < m.symbolSize; x++ {
-			if !m.isUsed[y + m.quietZoneSize][x + m.quietZoneSize] {
+			if !m.isUsed[y+m.quietZoneSize][x+m.quietZoneSize] {
 				count++
 			}
 		}
@@ -252,7 +252,7 @@ func (m *symbol) penalty3() int {
 				penalty += penaltyWeight3
 				bitBuffer = 0xFF
 			default:
-				if x == m.symbolSize - 1 && (bitBuffer & 0x7f) == 0x5d {
+				if x == m.symbolSize-1 && (bitBuffer&0x7f) == 0x5d {
 					penalty += penaltyWeight3
 					bitBuffer = 0xFF
 				}
@@ -276,7 +276,7 @@ func (m *symbol) penalty3() int {
 				penalty += penaltyWeight3
 				bitBuffer = 0xFF
 			default:
-				if y == m.symbolSize - 1 && (bitBuffer & 0x7f) == 0x5d {
+				if y == m.symbolSize-1 && (bitBuffer&0x7f) == 0x5d {
 					penalty += penaltyWeight3
 					bitBuffer = 0xFF
 				}

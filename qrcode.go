@@ -101,7 +101,7 @@ type QRCode struct {
 
 	data   *bitset.Bitset
 	symbol *symbol
-	mask int
+	mask   int
 }
 
 // New constructs a QRCode.
