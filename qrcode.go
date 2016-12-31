@@ -41,6 +41,7 @@ import (
 	"image"
 	"image/color"
 	"image/png"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -276,6 +277,22 @@ func (q *QRCode) PNG(size int) ([]byte, error) {
 	}
 
 	return b.Bytes(), nil
+}
+
+// Write writes the QR Code as a PNG image to io.Writer.
+//
+// size is both the image width and height in pixels. If size is too small then
+// a larger image is silently written.
+func (q *QRCode) Write(size int, out io.Writer) error {
+	var png []byte
+
+	png, err := q.PNG(size)
+
+	if err != nil {
+		return err
+	}
+	_, err = out.Write(png)
+	return err
 }
 
 // WriteFile writes the QR Code as a PNG image to the specified file.
