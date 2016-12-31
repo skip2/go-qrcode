@@ -10,7 +10,7 @@ Each QR Code contains error recovery information to aid reading damaged or obscu
 
 ## Install
 
-    go get -u github.com/skip2/go-qrcode
+    go get -u github.com/skip2/go-qrcode/...
 
 A command-line tool `qrcode` will be built into `$GOPATH/bin/`.
 
