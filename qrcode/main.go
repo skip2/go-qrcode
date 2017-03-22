@@ -56,7 +56,7 @@ Usage:
 	checkError(err)
 
 	if *textArt {
-		art := qr2String(q, true)
+		art := qr2String(q, false)
 		fmt.Println(art)
 		return
 	}
