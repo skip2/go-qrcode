@@ -4,6 +4,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"os"
@@ -15,6 +16,7 @@ import (
 func main() {
 	outFile := flag.String("o", "", "out PNG file prefix, empty for stdout")
 	size := flag.Int("s", 256, "image size (pixel)")
+	textArt := flag.Bool("t", false, "print as text-art on stdout")
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, `qrcode -- QR Code encoder in Go
 https://github.com/skip2/go-qrcode
@@ -53,6 +55,12 @@ Usage:
 	q, err = qrcode.New(content, qrcode.Highest)
 	checkError(err)
 
+	if *textArt {
+		art := qr2String(q, true)
+		fmt.Println(art)
+		return
+	}
+
 	var png []byte
 	png, err = q.PNG(*size)
 	checkError(err)
@@ -71,6 +79,23 @@ Usage:
 func checkError(err error) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s\n", err)
-		os.Exit(0)
+		os.Exit(1)
 	}
+}
+
+// qr2String produces a multi-line string that forms a QR-code image.
+func qr2String(qr *qrcode.QRCode, inverseColor bool) string {
+	bits := qr.Bitmap()
+	var buf bytes.Buffer
+	for y := range bits {
+		for x := range bits[y] {
+			if bits[y][x] != inverseColor {
+				buf.WriteString("  ")
+			} else {
+				buf.WriteString("■■")
+			}
+		}
+		buf.WriteString("\n")
+	}
+	return buf.String()
 }
