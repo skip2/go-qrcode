@@ -92,7 +92,7 @@ func qr2String(qr *qrcode.QRCode, inverseColor bool) string {
 			if bits[y][x] != inverseColor {
 				buf.WriteString("  ")
 			} else {
-				buf.WriteString("■■")
+				buf.WriteString("██")
 			}
 		}
 		buf.WriteString("\n")
