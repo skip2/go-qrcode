@@ -11,9 +11,11 @@ import (
 	"strings"
 
 	qrcode "github.com/skip2/go-qrcode"
+	"io/ioutil"
 )
 
 func main() {
+	inFile := flag.String("i", "", "content file, empty for STDIN")
 	outFile := flag.String("o", "", "out PNG file prefix, empty for stdout")
 	size := flag.Int("s", 256, "image size (pixel)")
 	textArt := flag.Bool("t", false, "print as text-art on stdout")
@@ -44,12 +46,25 @@ Usage:
 	if *size <= 0 {
 		checkError(fmt.Errorf("Error: value of -s should > 0"))
 	}
-	if len(flag.Args()) == 0 {
-		flag.Usage()
-		checkError(fmt.Errorf("Error: no content given"))
-	}
 
 	content := strings.Join(flag.Args(), " ")
+	if *inFile != "" {
+		b, err := ioutil.ReadFile(*inFile)
+		if err != nil {
+			checkError(err)
+		}
+		content += string(b)
+	} else {
+		b, err := ioutil.ReadAll(os.Stdin)
+		if err != nil {
+			checkError(err)
+		}
+		content += string(b)
+	}
+	if content == "" {
+		flag.Usage()
+		checkError(fmt.Errorf("Error: no content given？"))
+	}
 
 	var err error
 	var q *qrcode.QRCode
