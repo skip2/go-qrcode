@@ -41,9 +41,6 @@ Usage:
 	}
 	flag.Parse()
 
-	if *size <= 0 {
-		checkError(fmt.Errorf("Error: value of -s should > 0"))
-	}
 	if len(flag.Args()) == 0 {
 		flag.Usage()
 		checkError(fmt.Errorf("Error: no content given"))
