@@ -1,34 +1,31 @@
 // go-qrcode
 // Copyright 2014 Tom Harwood
-
+/*
+	Amendments Thu, 2017-December-14:
+	- test integration (go test -v)
+	- idiomatic go code
+*/
 package qrcode
 
 import (
 	"fmt"
 	"os"
+	"testing"
 )
 
-func ExampleEncode() {
-	var png []byte
-	png, err := Encode("https://example.org", Medium, 256)
-
-	if err != nil {
-		fmt.Printf("Error: %s", err.Error())
+func TestExampleEncode(t *testing.T) {
+	if png, err := Encode("https://example.org", Medium, 256); err != nil {
+		t.Errorf("Error: %s", err.Error())
 	} else {
 		fmt.Printf("PNG is %d bytes long", len(png))
 	}
 }
 
-func ExampleWriteFile() {
+func TestExampleWriteFile(t *testing.T) {
 	filename := "example.png"
-
-	err := WriteFile("https://example.org", Medium, 256, filename)
-
-	if err != nil {
-		err = os.Remove(filename)
-	}
-
-	if err != nil {
-		fmt.Printf("Error: %s", err.Error())
+	if err := WriteFile("https://example.org", Medium, 256, filename); err != nil {
+		if err = os.Remove(filename); err != nil {
+			t.Errorf("Error: %s", err.Error())
+		}
 	}
 }
