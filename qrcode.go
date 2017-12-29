@@ -535,3 +535,20 @@ func (q *QRCode) addPadding() {
 		log.Panicf("BUG: got len %d, expected %d", q.data.Len(), numDataBits)
 	}
 }
+
+// ToString produces a multi-line string that forms a QR-code image.
+func (q *QRCode) ToString(inverseColor bool) string {
+	bits := q.Bitmap()
+	var buf bytes.Buffer
+	for y := range bits {
+		for x := range bits[y] {
+			if bits[y][x] != inverseColor {
+				buf.WriteString("  ")
+			} else {
+				buf.WriteString("██")
+			}
+		}
+		buf.WriteString("\n")
+	}
+	return buf.String()
+}

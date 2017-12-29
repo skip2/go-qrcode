@@ -4,7 +4,6 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"os"
@@ -54,7 +53,7 @@ Usage:
 	checkError(err)
 
 	if *textArt {
-		art := qr2String(q, *negative)
+		art := q.ToString(*negative)
 		fmt.Println(art)
 		return
 	}
@@ -83,21 +82,4 @@ func checkError(err error) {
 		fmt.Fprintf(os.Stderr, "%s\n", err)
 		os.Exit(1)
 	}
-}
-
-// qr2String produces a multi-line string that forms a QR-code image.
-func qr2String(qr *qrcode.QRCode, inverseColor bool) string {
-	bits := qr.Bitmap()
-	var buf bytes.Buffer
-	for y := range bits {
-		for x := range bits[y] {
-			if bits[y][x] != inverseColor {
-				buf.WriteString("  ")
-			} else {
-				buf.WriteString("██")
-			}
-		}
-		buf.WriteString("\n")
-	}
-	return buf.String()
 }
