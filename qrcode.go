@@ -293,12 +293,7 @@ func (q *QRCode) Image(size int) image.Image {
 	// Saves a few bytes to have them in this order
 	p := color.Palette([]color.Color{q.BackgroundColor, q.ForegroundColor})
 	img := image.NewPaletted(rect, p)
-
-	for i := 0; i < size; i++ {
-		for j := 0; j < size; j++ {
-			img.Set(i, j, q.BackgroundColor)
-		}
-	}
+	fgClr := uint8(img.Palette.Index(q.ForegroundColor))
 
 	bitmap := q.symbol.bitmap()
 	for y, row := range bitmap {
@@ -308,7 +303,8 @@ func (q *QRCode) Image(size int) image.Image {
 				startY := y*pixelsPerModule + offset
 				for i := startX; i < startX+pixelsPerModule; i++ {
 					for j := startY; j < startY+pixelsPerModule; j++ {
-						img.Set(i, j, q.ForegroundColor)
+						pos := img.PixOffset(i, j)
+						img.Pix[pos] = fgClr
 					}
 				}
 			}
