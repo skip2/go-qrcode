@@ -61,6 +61,7 @@ import (
 
 	bitset "github.com/skip2/go-qrcode/bitset"
 	reedsolomon "github.com/skip2/go-qrcode/reedsolomon"
+	draw "golang.org/x/image/draw"
 )
 
 // Encode a QR Code and return a raw PNG image.
@@ -285,10 +286,10 @@ func (q *QRCode) Image(size int) image.Image {
 	// Size of each module drawn.
 	pixelsPerModule := size / realSize
 
-	// Center the symbol within the image.
-	offset := (size - realSize*pixelsPerModule) / 2
+	// culc rendering image size
+	imgSize := (size / realSize) * realSize
 
-	rect := image.Rectangle{Min: image.Point{0, 0}, Max: image.Point{size, size}}
+	rect := image.Rectangle{Min: image.Point{0, 0}, Max: image.Point{imgSize, imgSize}}
 
 	// Saves a few bytes to have them in this order
 	p := color.Palette([]color.Color{q.BackgroundColor, q.ForegroundColor})
@@ -299,8 +300,8 @@ func (q *QRCode) Image(size int) image.Image {
 	for y, row := range bitmap {
 		for x, v := range row {
 			if v {
-				startX := x*pixelsPerModule + offset
-				startY := y*pixelsPerModule + offset
+				startX := x * pixelsPerModule
+				startY := y * pixelsPerModule
 				for i := startX; i < startX+pixelsPerModule; i++ {
 					for j := startY; j < startY+pixelsPerModule; j++ {
 						pos := img.PixOffset(i, j)
@@ -311,7 +312,11 @@ func (q *QRCode) Image(size int) image.Image {
 		}
 	}
 
-	return img
+	// Resize drawn image to specified size
+	resizeImg := image.NewRGBA(image.Rect(0, 0, size, size))
+	draw.CatmullRom.Scale(resizeImg, resizeImg.Bounds(), img, img.Bounds(), draw.Over, nil)
+
+	return resizeImg
 }
 
 // PNG returns the QR Code as a PNG image.
