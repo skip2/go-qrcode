@@ -282,12 +282,7 @@ func (q *QRCode) Image(size int) image.Image {
 		size = realSize
 	}
 
-	// Size of each module drawn.
-	pixelsPerModule := size / realSize
-
-	// Center the symbol within the image.
-	offset := (size - realSize*pixelsPerModule) / 2
-
+	// Output image.
 	rect := image.Rectangle{Min: image.Point{0, 0}, Max: image.Point{size, size}}
 
 	// Saves a few bytes to have them in this order
@@ -295,18 +290,20 @@ func (q *QRCode) Image(size int) image.Image {
 	img := image.NewPaletted(rect, p)
 	fgClr := uint8(img.Palette.Index(q.ForegroundColor))
 
+	// QR code bitmap.
 	bitmap := q.symbol.bitmap()
-	for y, row := range bitmap {
-		for x, v := range row {
+
+	// Map each image pixel to the nearest QR code module.
+	modulesPerPixel := float64(realSize) / float64(size)
+	for y := 0; y < size; y++ {
+		for x := 0; x < size; x++ {
+			y2 := int(float64(y) * modulesPerPixel)
+			x2 := int(float64(x) * modulesPerPixel)
+
+			v := bitmap[y2][x2]
 			if v {
-				startX := x*pixelsPerModule + offset
-				startY := y*pixelsPerModule + offset
-				for i := startX; i < startX+pixelsPerModule; i++ {
-					for j := startY; j < startY+pixelsPerModule; j++ {
-						pos := img.PixOffset(i, j)
-						img.Pix[pos] = fgClr
-					}
-				}
+				pos := img.PixOffset(x, y)
+				img.Pix[pos] = fgClr
 			}
 		}
 	}
