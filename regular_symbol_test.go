@@ -19,7 +19,7 @@ func TestBuildRegularSymbol(t *testing.T) {
 			data.AppendNumBools(8, false)
 		}
 
-		s, err := buildRegularSymbol(*v, k, data)
+		s, err := buildRegularSymbol(*v, k, data, false)
 
 		if err != nil {
 			fmt.Println(err.Error())

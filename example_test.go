@@ -9,6 +9,7 @@ package qrcode
 
 import (
 	"fmt"
+	"image/color"
 	"os"
 	"testing"
 )
@@ -27,5 +28,26 @@ func TestExampleWriteFile(t *testing.T) {
 		if err = os.Remove(filename); err != nil {
 			t.Errorf("Error: %s", err.Error())
 		}
+	}
+}
+
+func TestExampleEncodeWithColourAndWithoutBorder(t *testing.T) {
+	q, err := New("https://example.org", Medium)
+	if err != nil {
+		t.Errorf("Error: %s", err)
+		return
+	}
+
+	// Optionally, disable the QR Code border.
+	q.DisableBorder = true
+
+	// Optionally, set the colours.
+	q.ForegroundColor = color.RGBA{R: 0x33, G: 0x33, B: 0x66, A: 0xff}
+	q.BackgroundColor = color.RGBA{R: 0xef, G: 0xef, B: 0xef, A: 0xff}
+
+	err = q.WriteFile(256, "example2.png")
+	if err != nil {
+		t.Errorf("Error: %s", err)
+		return
 	}
 }

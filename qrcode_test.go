@@ -151,6 +151,8 @@ func TestQRCodeISOAnnexIExample(t *testing.T) {
 			err.Error())
 	}
 
+	q.encode()
+
 	const expectedMask int = 2
 
 	if q.mask != 2 {
