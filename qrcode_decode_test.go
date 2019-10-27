@@ -196,7 +196,7 @@ func zbarimgDecode(q *QRCode) (string, error) {
 	}
 
 	cmd := exec.Command("zbarimg", "--quiet", "-Sdisable",
-		"-Sqrcode.enable", "/dev/stdin")
+		"-Sqrcode.enable", "-")
 
 	var out bytes.Buffer
 

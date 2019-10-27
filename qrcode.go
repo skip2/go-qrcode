@@ -135,6 +135,9 @@ type QRCode struct {
 	ForegroundColor color.Color
 	BackgroundColor color.Color
 
+	// Disable the QR Code border.
+	DisableBorder bool
+
 	encoder *dataEncoder
 	version qrCodeVersion
 
@@ -193,8 +196,6 @@ func New(content string, level RecoveryLevel) (*QRCode, error) {
 		version: *chosenVersion,
 	}
 
-	q.encode(chosenVersion.numTerminatorBitsRequired(encoded.Len()))
-
 	return q, nil
 }
 
@@ -239,8 +240,6 @@ func newWithForcedVersion(content string, version int, level RecoveryLevel) (*QR
 		version: *chosenVersion,
 	}
 
-	q.encode(chosenVersion.numTerminatorBitsRequired(encoded.Len()))
-
 	return q, nil
 }
 
@@ -251,6 +250,9 @@ func newWithForcedVersion(content string, version int, level RecoveryLevel) (*QR
 // The bitmap includes the required "quiet zone" around the QR Code to aid
 // decoding.
 func (q *QRCode) Bitmap() [][]bool {
+	// Build QR code.
+	q.encode()
+
 	return q.symbol.bitmap()
 }
 
@@ -268,6 +270,9 @@ func (q *QRCode) Bitmap() [][]bool {
 // negative number to increase the scale of the image. e.g. a size of -5 causes
 // each module (QR Code "pixel") to be 5px in size.
 func (q *QRCode) Image(size int) image.Image {
+	// Build QR code.
+	q.encode()
+
 	// Minimum pixels (both width and height) required.
 	realSize := q.symbol.size
 
@@ -296,11 +301,12 @@ func (q *QRCode) Image(size int) image.Image {
 	// Map each image pixel to the nearest QR code module.
 	modulesPerPixel := float64(realSize) / float64(size)
 	for y := 0; y < size; y++ {
+		y2 := int(float64(y) * modulesPerPixel)
 		for x := 0; x < size; x++ {
-			y2 := int(float64(y) * modulesPerPixel)
 			x2 := int(float64(x) * modulesPerPixel)
 
 			v := bitmap[y2][x2]
+
 			if v {
 				pos := img.PixOffset(x, y)
 				img.Pix[pos] = fgClr
@@ -368,7 +374,9 @@ func (q *QRCode) WriteFile(size int, filename string) error {
 // encode completes the steps required to encode the QR Code. These include
 // adding the terminator bits and padding, splitting the data into blocks and
 // applying the error correction, and selecting the best data mask.
-func (q *QRCode) encode(numTerminatorBits int) {
+func (q *QRCode) encode() {
+	numTerminatorBits := q.version.numTerminatorBitsRequired(q.data.Len())
+
 	q.addTerminatorBits(numTerminatorBits)
 	q.addPadding()
 
@@ -381,7 +389,7 @@ func (q *QRCode) encode(numTerminatorBits int) {
 		var s *symbol
 		var err error
 
-		s, err = buildRegularSymbol(q.version, mask, encoded)
+		s, err = buildRegularSymbol(q.version, mask, encoded, !q.DisableBorder)
 
 		if err != nil {
 			log.Panic(err.Error())
