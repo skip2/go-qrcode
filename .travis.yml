@@ -1,8 +1,11 @@
 language: go
 
+before_install:
+ - sudo apt-get -y install zbar-tools
+
 go:
  - 1.7
 
 script:
- - go test -v ./...
+ - go test -v --test-decode ./...
 

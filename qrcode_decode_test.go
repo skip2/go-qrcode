@@ -5,9 +5,12 @@ package qrcode
 
 import (
 	"bytes"
+	"encoding/base64"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"math/rand"
+	"os"
 	"os/exec"
 	"strings"
 	"testing"
@@ -78,6 +81,48 @@ func TestDecodeBasic(t *testing.T) {
 
 		if err != nil {
 			t.Error(err.Error())
+		}
+	}
+}
+
+func TestDecodeSelectedStrings(t *testing.T) {
+	if !*testDecode {
+		t.Skip("Decode tests not enabled")
+	}
+
+	testStrings := []string{
+		"8888888888",
+		"88888888885555",
+		"8888888888aaaa",
+		"8888888888aaaa8888",
+		"8888888888aaaa8888a8a8a8a",
+		"8888888888aaaa8888a8a8a8o",
+		"8aaaa8o",
+		"8aaaa8oooooo8o8o8o8o",
+		"16aaaa",
+		"2aaaa",
+		"3aaaa",
+		"a3aaaa",
+		"##3aaaa",
+	}
+
+	for _, content := range testStrings {
+		for _, level := range []RecoveryLevel{Low, Medium, High, Highest} {
+			t.Logf("Testing encode, then decode with zbarimg: RecoveryLevel: %v, content:'%s'",
+				level,
+				content)
+
+			q, err := New(content, level)
+			if err != nil {
+				t.Error(err.Error())
+			}
+
+			err = zbarimgCheck(q)
+
+			if err != nil {
+				t.Error(err.Error())
+			}
+
 		}
 	}
 }
@@ -187,29 +232,42 @@ func zbarimgCheck(q *QRCode) error {
 }
 
 func zbarimgDecode(q *QRCode) (string, error) {
-	var png []byte
+	tmpFile, err := ioutil.TempFile(os.TempDir(), "go-qrcode-test-")
+	if err != nil {
+		return "", fmt.Errorf("Cannot create temporary file: %s", err)
+	}
 
-	// 512x512px
-	png, err := q.PNG(512)
+	defer os.Remove(tmpFile.Name())
+
+	err = q.WriteFile(512, tmpFile.Name())
 	if err != nil {
 		return "", err
 	}
 
-	cmd := exec.Command("zbarimg", "--quiet", "-Sdisable",
-		"-Sqrcode.enable", "-")
+	cmd := exec.Command("zbarimg", "-Sdisable",
+		"-Sqrcode.enable", tmpFile.Name())
 
-	var out bytes.Buffer
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
 
-	cmd.Stdin = bytes.NewBuffer(png)
-	cmd.Stdout = &out
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
 
 	err = cmd.Run()
 
 	if err != nil {
-		return "", err
+		content, _ := ioutil.ReadFile(tmpFile.Name())
+		contentBase64 := base64.StdEncoding.EncodeToString(content)
+
+		return "", fmt.Errorf("zbarimg failed with err=%s, stderr=%s, qrcode=\n%si\n\nPNG base64=%s",
+			err,
+			stderr.String(),
+			q.ToString(false),
+			contentBase64,
+		)
 	}
 
-	return strings.TrimSuffix(strings.TrimPrefix(out.String(), "QR-Code:"), "\n"), nil
+	return strings.TrimSuffix(strings.TrimPrefix(stdout.String(), "QR-Code:"), "\n"), nil
 }
 
 func BenchmarkDecodeTest(b *testing.B) {
