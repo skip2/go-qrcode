@@ -82,6 +82,48 @@ func TestDecodeBasic(t *testing.T) {
 	}
 }
 
+func TestDecodeSelectedStrings(t *testing.T) {
+	if !*testDecode {
+		t.Skip("Decode tests not enabled")
+	}
+
+	testStrings := []string{
+		"8888888888",
+		"88888888885555",
+		"8888888888aaaa",
+		"8888888888aaaa8888",
+		"8888888888aaaa8888a8a8a8a",
+		"8888888888aaaa8888a8a8a8o",
+		"8aaaa8o",
+		"8aaaa8oooooo8o8o8o8o",
+		"16aaaa",
+		"2aaaa",
+		"3aaaa",
+		"a3aaaa",
+		"##3aaaa",
+	}
+
+	for _, content := range testStrings {
+		for _, level := range []RecoveryLevel{Low, Medium, High, Highest} {
+			t.Logf("Testing encode, then decode with zbarimg: RecoveryLevel: %v, content:'%s'",
+				level,
+				content)
+
+			q, err := New(content, level)
+			if err != nil {
+				t.Error(err.Error())
+			}
+
+			err = zbarimgCheck(q)
+
+			if err != nil {
+				t.Error(err.Error())
+			}
+
+		}
+	}
+}
+
 func TestDecodeAllVersionLevels(t *testing.T) {
 	if !*testDecode {
 		t.Skip("Decode tests not enabled")
