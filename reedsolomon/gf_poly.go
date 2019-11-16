@@ -96,6 +96,9 @@ func gfPolyRemainder(numerator, denominator gfPoly) gfPoly {
 		log.Panicln("Remainder by zero")
 	}
 
+	numerator = numerator.normalised()
+	denominator = denominator.normalised()
+
 	remainder := numerator
 
 	for remainder.numTerms() >= denominator.numTerms() {

@@ -141,7 +141,7 @@ func TestGFPolyRemainder(t *testing.T) {
 		{
 			gfPoly{[]gfElement{1}},
 			gfPoly{[]gfElement{1, 0}},
-			gfPoly{[]gfElement{1}},
+			gfPoly{[]gfElement{0}},
 		},
 		{
 			gfPoly{[]gfElement{1, 0, 1}},
