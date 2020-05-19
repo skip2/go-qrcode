@@ -51,6 +51,7 @@ package qrcode
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"image"
 	"image/color"
 	"image/png"
@@ -199,7 +200,13 @@ func New(content string, level RecoveryLevel) (*QRCode, error) {
 	return q, nil
 }
 
-func newWithForcedVersion(content string, version int, level RecoveryLevel) (*QRCode, error) {
+// NewWithForcedVersion constructs a QRCode of a specific version.
+//
+//	var q *qrcode.QRCode
+//	q, err := qrcode.NewWithForcedVersion("my content", 25, qrcode.Medium)
+//
+// An error occurs in case of invalid version.
+func NewWithForcedVersion(content string, version int, level RecoveryLevel) (*QRCode, error) {
 	var encoder *dataEncoder
 
 	switch {
@@ -210,7 +217,7 @@ func newWithForcedVersion(content string, version int, level RecoveryLevel) (*QR
 	case version >= 27 && version <= 40:
 		encoder = newDataEncoder(dataEncoderType27To40)
 	default:
-		log.Fatalf("Invalid version %d (expected 1-40 inclusive)", version)
+		return nil, fmt.Errorf("Invalid version %d (expected 1-40 inclusive)", version)
 	}
 
 	var encoded *bitset.Bitset

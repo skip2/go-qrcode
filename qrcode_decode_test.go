@@ -93,7 +93,7 @@ func TestDecodeAllVersionLevels(t *testing.T) {
 				version,
 				level)
 
-			q, err := newWithForcedVersion(
+			q, err := NewWithForcedVersion(
 				fmt.Sprintf("v-%d l-%d", version, level), version, level)
 			if err != nil {
 				t.Fatal(err.Error())
