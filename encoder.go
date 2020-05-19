@@ -180,6 +180,25 @@ func (d *dataEncoder) encode(data []byte) (*bitset.Bitset, error) {
 		return nil, err
 	}
 
+	// Check if a single byte encoded segment would be more efficient.
+	optimizedLength := 0
+	for _, s := range d.optimised {
+		length, err := d.encodedLength(s.dataMode, len(s.data))
+		if err != nil {
+			return nil, err
+		}
+		optimizedLength += length
+	}
+
+	singleByteSegmentLength, err := d.encodedLength(dataModeByte, len(d.data))
+	if err != nil {
+		return nil, err
+	}
+
+	if singleByteSegmentLength <= optimizedLength {
+		d.optimised = []segment{segment{dataMode: dataModeByte, data: d.data}}
+	}
+
 	// Encode data.
 	encoded := bitset.New()
 	for _, s := range d.optimised {
