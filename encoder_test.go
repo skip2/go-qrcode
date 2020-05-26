@@ -180,17 +180,49 @@ func TestOptimiseEncoding(t *testing.T) {
 		{
 			dataEncoderType1To9,
 			[]testModeSegment{
+				{dataModeAlphanumeric, 100},
+				{dataModeByte, 1},
+				{dataModeNumeric, 1},
+			},
+			[]testModeSegment{
+				{dataModeAlphanumeric, 100},
+				{dataModeByte, 2},
+			},
+		},
+		// Sometimes encoding everything as bytes is more efficient.
+		{
+			dataEncoderType1To9,
+			[]testModeSegment{
 				{dataModeAlphanumeric, 1},
 				{dataModeByte, 1},
 				{dataModeNumeric, 1},
 			},
 			[]testModeSegment{
+				{dataModeByte, 3},
+			},
+		},
+		// https://www.google.com/123456789012345678901234567890
+		// BBBBBAAABBBABBBBBBABBBANNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+		{
+			dataEncoderType1To9,
+			[]testModeSegment{
+				{dataModeByte, 5},
+				{dataModeAlphanumeric, 3},
+				{dataModeByte, 3},
 				{dataModeAlphanumeric, 1},
-				{dataModeByte, 2},
+				{dataModeByte, 6},
+				{dataModeAlphanumeric, 1},
+				{dataModeAlphanumeric, 4},
+				{dataModeNumeric, 30},
+			},
+			[]testModeSegment{
+				{dataModeByte, 23},
+				{dataModeNumeric, 30},
 			},
 		},
 		// https://www.google.com/123
 		// BBBBBAAABBBABBBBBBABBBANNN
+		// Small segments are inefficient because of additional metadata.
 		{
 			dataEncoderType1To9,
 			[]testModeSegment{
@@ -204,8 +236,7 @@ func TestOptimiseEncoding(t *testing.T) {
 				{dataModeNumeric, 3},
 			},
 			[]testModeSegment{
-				{dataModeByte, 23},
-				{dataModeNumeric, 3},
+				{dataModeByte, 26},
 			},
 		},
 		// HTTPS://WWW.GOOGLE.COM/123
