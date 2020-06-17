@@ -267,6 +267,57 @@ func TestOptimiseEncoding(t *testing.T) {
 				{dataModeByte, 8},
 			},
 		},
+		// HTTPS://ABC.DE/Q/393AABB6998877XYZ0518AUQCRVJN25
+		// AAAAAAAAAAAAAAAAANNNAAAANNNNNNNAAANNNNAAAAAAAANN
+		// different to below---------^--------------------
+		{
+			dataEncoderType1To9,
+			[]testModeSegment{
+				{dataModeAlphanumeric, 17},
+				{dataModeNumeric, 3},
+				{dataModeAlphanumeric, 4},
+				{dataModeNumeric, 7},
+				{dataModeAlphanumeric, 3},
+				{dataModeNumeric, 4},
+				{dataModeAlphanumeric, 8},
+				{dataModeNumeric, 2},
+			},
+			[]testModeSegment{
+				{dataModeAlphanumeric, 48},
+			},
+		},
+		// HTTPS://ABC.DE/Q/393AABB699E877XYZ0518AUQCRVJN25
+		// AAAAAAAAAAAAAAAAANNNAAAANNNANNNAAANNNNAAAAAAAANN
+		// different to above---------^--------------------
+		{
+			dataEncoderType1To9,
+			[]testModeSegment{
+				{dataModeAlphanumeric, 17},
+				{dataModeNumeric, 3},
+				{dataModeAlphanumeric, 4},
+				{dataModeNumeric, 3},
+				{dataModeAlphanumeric, 1},
+				{dataModeNumeric, 3},
+				{dataModeAlphanumeric, 3},
+				{dataModeNumeric, 4},
+				{dataModeAlphanumeric, 8},
+				{dataModeNumeric, 2},
+			},
+			[]testModeSegment{
+				{dataModeAlphanumeric, 48},
+			},
+		},
+		// 0123456789
+		// NNNNNNNNNN
+		{
+			dataEncoderType1To9,
+			[]testModeSegment{
+				{dataModeNumeric, 10},
+			},
+			[]testModeSegment{
+				{dataModeNumeric, 10},
+			},
+		},
 	}
 
 	for _, test := range tests {

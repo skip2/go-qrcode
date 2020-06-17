@@ -233,6 +233,13 @@ func NewWithForcedVersion(content string, version int, level RecoveryLevel) (*QR
 		return nil, errors.New("cannot find QR Code version")
 	}
 
+	if encoded.Len() > chosenVersion.numDataBits() {
+		return nil, fmt.Errorf("Cannot encode QR code: content too large for fixed size QR Code version %d (encoded length is %d bits, maximum length is %d bits)",
+			version,
+			encoded.Len(),
+			chosenVersion.numDataBits())
+	}
+
 	q := &QRCode{
 		Content: content,
 
