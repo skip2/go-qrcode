@@ -7,7 +7,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"math/rand"
 	"os/exec"
 	"strings"
 	"testing"
@@ -113,6 +112,7 @@ func TestDecodeAllVersionLevels(t *testing.T) {
 	}
 }
 
+/*
 func TestDecodeAllCharacters(t *testing.T) {
 	if !*testDecode {
 		t.Skip("Decode tests not enabled")
@@ -136,7 +136,9 @@ func TestDecodeAllCharacters(t *testing.T) {
 		t.Error(err.Error())
 	}
 }
+*/
 
+/*
 func TestDecodeFuzz(t *testing.T) {
 	if !*testDecodeFuzz {
 		t.Skip("Decode fuzz tests not enabled")
@@ -171,6 +173,7 @@ func TestDecodeFuzz(t *testing.T) {
 		}
 	}
 }
+*/
 
 func zbarimgCheck(q *QRCode) error {
 	s, err := zbarimgDecode(q)

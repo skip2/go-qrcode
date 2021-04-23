@@ -4,6 +4,7 @@
 package qrcode
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -159,6 +160,16 @@ func TestQRCodeISOAnnexIExample(t *testing.T) {
 		t.Errorf("ISO Annex I example mask got %d, expected %d\n", q.mask,
 			expectedMask)
 	}
+}
+
+func TestASCII(t *testing.T) {
+	var q *QRCode
+	q, err := New("ASCII OUTPUT TEST 0123456789", Medium)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Print(q.ASCII())
 }
 
 func BenchmarkQRCodeURLSize(b *testing.B) {

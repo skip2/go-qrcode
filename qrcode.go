@@ -385,6 +385,27 @@ func (q *QRCode) WriteFile(size int, filename string) error {
 	return ioutil.WriteFile(filename, png, os.FileMode(0644))
 }
 
+// ASCII generates ASCII representation of QR code
+func (q *QRCode) ASCII() string {
+	bitmap := q.Bitmap()
+	row := len(bitmap)
+	column := len(bitmap[0])
+
+	var out bytes.Buffer
+	for i := 0; i < row; i++ {
+		for j := 0; j < column; j++ {
+			if bitmap[i][j] {
+				fmt.Fprint(&out, "\u2588\u2588")
+			} else {
+				fmt.Fprint(&out, "  ")
+			}
+		}
+		fmt.Fprintln(&out, "")
+	}
+
+	return out.String()
+}
+
 // encode completes the steps required to encode the QR Code. These include
 // adding the terminator bits and padding, splitting the data into blocks and
 // applying the error correction, and selecting the best data mask.
