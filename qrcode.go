@@ -106,7 +106,7 @@ func WriteFile(content string, level RecoveryLevel, size int, filename string) e
 // size is both the image width and height in pixels. If size is too small then
 // a larger image is silently written. Negative values for size cause a variable
 // sized image to be written: See the documentation for Image().
-func WriteColorFile(content string, level RecoveryLevel, size int, background,
+func WriteColorFile(content string, level RecoveryLevel, size int, background color.Color,
 	foreground color.Color, filename string) error {
 
 	var q *QRCode
