@@ -22,6 +22,14 @@ func TestExampleEncode(t *testing.T) {
 	}
 }
 
+func TestExampleEncodeColor(t *testing.T) {
+	if png, err := EncodeColor("https://example.org", Medium, 256, color.RGBA{R: 255, A: 255}, color.RGBA{G: 255, A: 255}); err != nil {
+		t.Errorf("Error: %s", err.Error())
+	} else {
+		fmt.Printf("PNG is %d bytes long", len(png))
+	}
+}
+
 func TestExampleWriteFile(t *testing.T) {
 	filename := "example.png"
 	if err := WriteFile("https://example.org", Medium, 256, filename); err != nil {

@@ -122,7 +122,7 @@ func TestDecodeAllCharacters(t *testing.T) {
 
 	// zbarimg has trouble with null bytes, hence start from ASCII 1.
 	for i := 1; i < 256; i++ {
-		content += string(i)
+		content += string(rune(i))
 	}
 
 	q, err := New(content, Low)
@@ -154,7 +154,7 @@ func TestDecodeFuzz(t *testing.T) {
 		for j := 0; j < len; j++ {
 			// zbarimg seems to have trouble with special characters, test printable
 			// characters only for now.
-			content += string(32 + r.Intn(94))
+			content += string(rune(32 + r.Intn(94)))
 		}
 
 		for _, level := range []RecoveryLevel{Low, Medium, High, Highest} {
