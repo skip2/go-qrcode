@@ -1,7 +1,10 @@
 language: go
 
 go:
- - 1.7
+ - '1.17'
+ - '1.18'
+ - '1.19'
+ - master
 
 script:
  - go test -v ./...
