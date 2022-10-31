@@ -58,8 +58,10 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"math"
 	"os"
 
+	svg "github.com/ajstarks/svgo"
 	bitset "github.com/skip2/go-qrcode/bitset"
 	reedsolomon "github.com/skip2/go-qrcode/reedsolomon"
 )
@@ -349,6 +351,52 @@ func (q *QRCode) PNG(size int) ([]byte, error) {
 	}
 
 	return b.Bytes(), nil
+}
+
+func svgColor(c color.Color) string {
+	r, g, b, _ := c.RGBA()
+	return fmt.Sprintf("fill:rgb(%d,%d,%d)", r, g, b)
+}
+
+// SVG returns the QR Code as a SVG image.
+//
+// size is both the image width and height in pixels. If size is too small then
+// a larger image is silently returned. Negative values for size cause a
+// variable sized image to be returned, as with PNG().
+func (q *QRCode) SVG(size int) ([]byte, error) {
+	// Build QR code.
+	q.encode()
+
+	// Minimum pixels (both width and height) required.
+	realSize := q.symbol.size
+
+	// Variable size support.
+	if size < 0 {
+		size = size * -1 * realSize
+	}
+
+	// Actual pixels available to draw the symbol. Automatically increase the
+	// image size if it's not large enough.
+	if size < realSize {
+		size = realSize
+	}
+	bitmap := q.symbol.bitmap()
+	var buf bytes.Buffer
+	canvas := svg.New(&buf)
+	canvas.Start(size, size)
+	// Create background.
+	canvas.Rect(0, 0, size, size, svgColor(q.BackgroundColor))
+	px := int(math.RoundToEven(float64(size) / float64(realSize)))
+	for yb, xbs := range bitmap {
+		for xb, v := range xbs {
+			if v {
+				x, y := (xb*px)-px, (yb*px)-px
+				canvas.Rect(x, y, px, px, svgColor(q.ForegroundColor))
+			}
+		}
+	}
+	canvas.End()
+	return buf.Bytes(), nil
 }
 
 // Write writes the QR Code as a PNG image to io.Writer.
