@@ -13,8 +13,9 @@ import (
 )
 
 func main() {
-	outFile := flag.String("o", "", "out PNG file prefix, empty for stdout")
+	outFile := flag.String("o", "", "out file prefix, empty for stdout")
 	size := flag.Int("s", 256, "image size (pixel)")
+	vector := flag.Bool("v", false, "render QR code as SVG instead of PNG")
 	textArt := flag.Bool("t", false, "print as text-art on stdout")
 	negative := flag.Bool("i", false, "invert black and white")
 	disableBorder := flag.Bool("d", false, "disable QR Code border")
@@ -67,18 +68,24 @@ Usage:
 		q.ForegroundColor, q.BackgroundColor = q.BackgroundColor, q.ForegroundColor
 	}
 
-	var png []byte
-	png, err = q.PNG(*size)
+	render := q.PNG
+	suffix := "png"
+	if *vector {
+		render = q.SVG
+		suffix = "svg"
+	}
+
+	data, err := render(*size)
 	checkError(err)
 
 	if *outFile == "" {
-		os.Stdout.Write(png)
+		os.Stdout.Write(data)
 	} else {
 		var fh *os.File
-		fh, err = os.Create(*outFile + ".png")
+		fh, err = os.Create(fmt.Sprintf("%v.%v", *outFile, suffix))
 		checkError(err)
 		defer fh.Close()
-		fh.Write(png)
+		fh.Write(data)
 	}
 }
 
