@@ -118,13 +118,13 @@ func TestDecodeAllCharacters(t *testing.T) {
 		t.Skip("Decode tests not enabled")
 	}
 
-	var content string
-
+	var raw []byte
 	// zbarimg has trouble with null bytes, hence start from ASCII 1.
 	for i := 1; i < 256; i++ {
-		content += string(i)
+		raw = append(raw, byte(i))
 	}
 
+	content := string(raw)
 	q, err := New(content, Low)
 	if err != nil {
 		t.Error(err.Error())
@@ -150,13 +150,14 @@ func TestDecodeFuzz(t *testing.T) {
 	for i := 0; i < iterations; i++ {
 		len := r.Intn(maxLength-1) + 1
 
-		var content string
+		var raw []byte
 		for j := 0; j < len; j++ {
 			// zbarimg seems to have trouble with special characters, test printable
 			// characters only for now.
-			content += string(32 + r.Intn(94))
+			raw = append(raw, byte(32+r.Intn(94)))
 		}
 
+		content := string(raw)
 		for _, level := range []RecoveryLevel{Low, Medium, High, Highest} {
 			q, err := New(content, level)
 			if err != nil {
