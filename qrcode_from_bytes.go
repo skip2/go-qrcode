@@ -153,7 +153,7 @@ type QRCodeFromBytes struct {
 //	q, err := qrcode.New("my content", qrcode.Medium)
 //
 // An error occurs if the content is too long.
-func NewFromBytes(contentBytes []byte, level RecoveryLevel) (*QRCode, error) {
+func NewFromBytes(contentBytes []byte, level RecoveryLevel) (*QRCodeFromBytes, error) {
 	encoders := []dataEncoderType{dataEncoderType1To9, dataEncoderType10To26,
 		dataEncoderType27To40}
 
