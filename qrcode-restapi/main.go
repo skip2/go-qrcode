@@ -1,16 +1,77 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"image/color"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/gin-gonic/gin"
 	qrcode "github.com/skip2/go-qrcode"
 )
+
+func init() {
+	initLog()
+}
+
+func initLog() {
+	// setup logrus
+	logLevel, err := log.ParseLevel(os.Getenv("LOG_LEVEL"))
+	if err != nil {
+		logLevel = log.InfoLevel
+	}
+
+	log.SetLevel(logLevel)
+}
+
+func LoggingMiddleware() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		// Starting time
+		startTime := time.Now()
+
+		// Processing request
+		// ctx.Next() // bug?
+
+		// End Time
+		endTime := time.Now()
+
+		// execution time
+		latencyTime := endTime.Sub(startTime)
+
+		// Request method
+		reqMethod := ctx.Request.Method
+
+		// Request route
+		reqUri := ctx.Request.RequestURI
+
+		// status code
+		statusCode := ctx.Writer.Status()
+
+		// Request IP
+		clientIP := ctx.ClientIP()
+
+		reqBody, _ := io.ReadAll(ctx.Request.Body)
+		ctx.Request.Body = io.NopCloser(bytes.NewReader(reqBody))
+
+		log.WithFields(log.Fields{
+			"6_BODY":      string(reqBody),
+			"5_METHOD":    reqMethod,
+			"2_URI":       reqUri,
+			"3_STATUS":    statusCode,
+			"4_LATENCY":   latencyTime,
+			"1_CLIENT_IP": clientIP,
+		}).Info("HTTP REQUEST")
+
+		ctx.Next()
+	}
+}
 
 // https://stackoverflow.com/questions/54197913/parse-hex-string-to-image-color
 func ParseHexColor(s string) (c color.RGBA, err error) {
@@ -26,7 +87,6 @@ func ParseHexColor(s string) (c color.RGBA, err error) {
 		c.B *= 17
 	default:
 		err = fmt.Errorf("invalid length, must be 7 or 4")
-
 	}
 	return
 }
@@ -57,7 +117,7 @@ func getQRCode(c *gin.Context) {
 		} else if strings.Compare(ecc, "H") == 0 {
 			recovery_level = qrcode.Highest
 		} else {
-			fmt.Fprintf(os.Stderr, "%s\n", "ECC aka RecoveryLevel is not supported")
+			log.Error("ECC aka RecoveryLevel is not supported")
 		}
 	}
 
@@ -81,6 +141,9 @@ func getQRCode(c *gin.Context) {
 func main() {
 	router := gin.New()
 
+	router.Use(gin.Recovery())
+	router.Use(LoggingMiddleware())
+
 	router.GET("/api/qrcode", getQRCode)
 
 	router.Run(":6868")
@@ -88,7 +151,6 @@ func main() {
 
 func checkError(err error) {
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", err)
-		// os.Exit(1)
+		log.Error(err)
 	}
 }
