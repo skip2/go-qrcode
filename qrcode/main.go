@@ -9,11 +9,12 @@ import (
 	"os"
 	"strings"
 
-	qrcode "github.com/skip2/go-qrcode"
+	qrcode "github.com/uncopied/go-qrcode"
 )
 
 func main() {
-	outFile := flag.String("o", "", "out PNG file prefix, empty for stdout")
+	outFile := flag.String("o", "qrcode", "output file prefix")
+	outFormat := flag.String("f", "png", "output file format PNG(default) or SVG")
 	size := flag.Int("s", 256, "image size (pixel)")
 	textArt := flag.Bool("t", false, "print as text-art on stdout")
 	negative := flag.Bool("i", false, "invert black and white")
@@ -67,19 +68,25 @@ Usage:
 		q.ForegroundColor, q.BackgroundColor = q.BackgroundColor, q.ForegroundColor
 	}
 
-	var png []byte
-	png, err = q.PNG(*size)
-	checkError(err)
-
-	if *outFile == "" {
-		os.Stdout.Write(png)
-	} else {
+	if *outFormat == "png" {
+		var png []byte
+		png, err = q.PNG(*size)
+		checkError(err)
 		var fh *os.File
 		fh, err = os.Create(*outFile + ".png")
 		checkError(err)
 		defer fh.Close()
 		fh.Write(png)
+	} else if *outFormat == "svg" {
+		qrSVG, _ := q.SVG()
+		var fh *os.File
+		fh, err = os.Create(*outFile + ".svg")
+		checkError(err)
+		defer fh.Close()
+		fh.WriteString(qrSVG)
+
 	}
+
 }
 
 func checkError(err error) {

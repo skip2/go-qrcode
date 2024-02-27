@@ -14,7 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/gin-gonic/gin"
-	qrcode "github.com/skip2/go-qrcode"
+	qrcode "github.com/uncopied/go-qrcode"
 )
 
 func init() {
@@ -101,7 +101,7 @@ func getQRCode(c *gin.Context) {
 	var color string = c.Query("color")
 	var bgcolor string = c.Query("bgcolor")
 	// qzone, no qzone is supported yet in go-qrcode
-	// format, only png format is supported in go-qrcode
+	var format string = strings.ToLower(c.Query("format"))
 
 	if (strings.Compare(ecc, "L") == 0) ||
 		(strings.Compare(ecc, "M") == 0) ||
@@ -130,12 +130,32 @@ func getQRCode(c *gin.Context) {
 	q.ForegroundColor = mycolor
 	q.BackgroundColor = mybgcolor
 
-	var png []byte
-	png, err = q.PNG(size)
-	checkError(err)
+	if strings.Compare(format, "svg") == 0 {
+		qrSVG, err := q.SVG()
+		checkError(err)
 
-	c.Header("Content-Disposition", "inline; filename=qrcode.png")
-	c.Data(http.StatusOK, "application/octet-stream", png)
+		c.Header("Content-Disposition", "inline; filename=qrcode.svg")
+		c.Data(http.StatusOK, "application/octet-stream", []byte(qrSVG))
+	} else /* if strings.Compare(format, "eps") == 0 {
+		qrEPS, err := q.EPS()
+		checkError(err)
+
+		c.Header("Content-Disposition", "inline; filename=qrcode.eps")
+		c.Data(http.StatusOK, "application/octet-stream", []byte(qrEPS))
+	} else if strings.Compare(format, "pdf") == 0 {
+		qrPDF, err := q.PDF()
+		checkError(err)
+
+		c.Header("Content-Disposition", "inline; filename=qrcode.pdf")
+		c.Data(http.StatusOK, "application/octet-stream", []byte(qrPDF))
+	} else */{
+		var png []byte
+		png, err = q.PNG(size)
+		checkError(err)
+
+		c.Header("Content-Disposition", "inline; filename=qrcode.png")
+		c.Data(http.StatusOK, "application/octet-stream", png)
+	}
 }
 
 func main() {
