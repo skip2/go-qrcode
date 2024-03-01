@@ -39,7 +39,7 @@ All examples use the qrcode.Medium error Recovery Level and create a fixed 256x2
 
 ## Demoapp
 
-[http://go-qrcode.appspot.com](http://go-qrcode.appspot.com)
+[http://cuong.net](http://cuong.net:6868/api/qrcode?data=abc&size=800&color=00FF00&bgcolor=FF00FF&ecc=L&format=png)
 
 ## CLI
 
@@ -70,6 +70,28 @@ Usage:
        qrcode "homepage: https://github.com/skip2/go-qrcode" > out.png
 
 ```
+
+## REST-API
+
+### Build and Start
+
+```
+go build ./qrcode-restapi/main.go 
+./main
+```
+
+### Usage
+```
+wget "http://localhost:6868/api/qrcode?data=abc&size=800&color=00FF00&bgcolor=FF00FF&ecc=L&format=png"
+```
+
+### Parameters
+- data as string
+- size in pixel
+- color and bgcolor as hex
+- ecc aka recovery level can be set as L, M, Q or H for Low, Medium, Quality or Highest
+- format supported are png or svg
+
 ## Maximum capacity
 The maximum capacity of a QR Code varies according to the content encoded and the error recovery level. The maximum capacity is 2,953 bytes, 4,296 alphanumeric characters, 7,089 numeric digits, or a combination of these.
 
