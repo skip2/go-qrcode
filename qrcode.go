@@ -60,8 +60,10 @@ import (
 	"log"
 	"os"
 
-	bitset "github.com/skip2/go-qrcode/bitset"
-	reedsolomon "github.com/skip2/go-qrcode/reedsolomon"
+	canvas "github.com/tdewolff/canvas"
+	"github.com/tdewolff/canvas/renderers/svg"
+	bitset "github.com/uncopied/go-qrcode/bitset"
+	reedsolomon "github.com/uncopied/go-qrcode/reedsolomon"
 )
 
 // Encode a QR Code and return a raw PNG image.
@@ -331,6 +333,70 @@ func (q *QRCode) Image(size int) image.Image {
 	return img
 }
 
+func (q *QRCode) DrawQRCode(ctx *canvas.Context, xQRCode float64, yQRCode float64, widthQRCode float64) {
+	// Build QR code.
+	q.encode()
+
+	// Minimum pixels (both width and height) required.
+	size := q.symbol.size
+	if size == 0 {
+		log.Fatal("q.symbol.size is ZERO, will /0 fail")
+	}
+	pixelWidth := widthQRCode / float64(size)
+
+	ctx.SetFillColor(canvas.White)
+	ctx.DrawPath(xQRCode, yQRCode, canvas.Rectangle(widthQRCode, widthQRCode))
+
+	// Saves a few bytes to have them in this order
+	ctx.SetFillColor(canvas.Black)
+
+	// QR code bitmap.
+	bitmap := q.symbol.bitmap()
+
+	// Map each image pixel to the nearest QR code module.
+	for y := 0; y < size; y++ {
+		for x := 0; x < size; x++ {
+			v := bitmap[y][x]
+			if v {
+				ctx.DrawPath(xQRCode+float64(x)*pixelWidth, yQRCode+float64(size-y)*pixelWidth, canvas.Rectangle(pixelWidth, pixelWidth))
+			}
+		}
+	}
+}
+
+// Canvas returns the QR Code as an image.Image.
+//
+// Based on Image
+func (q *QRCode) Canvas() *canvas.Canvas {
+	// Build QR code.
+	q.encode()
+
+	// Minimum pixels (both width and height) required.
+	size := q.symbol.size
+
+	c := canvas.New(float64(size), float64(size))
+	ctx := canvas.NewContext(c)
+	ctx.SetFillColor(canvas.White)
+	ctx.DrawPath(float64(0), float64(0), canvas.Rectangle(float64(size), float64(size)))
+
+	// Saves a few bytes to have them in this order
+	ctx.SetFillColor(canvas.Black)
+
+	// QR code bitmap.
+	bitmap := q.symbol.bitmap()
+
+	// Map each image pixel to the nearest QR code module.
+	for y := 0; y < size; y++ {
+		for x := 0; x < size; x++ {
+			v := bitmap[y][x]
+			if v {
+				ctx.DrawPath(float64(x), float64(size-y), canvas.Rectangle(float64(1), float64(1)))
+			}
+		}
+	}
+	return c
+}
+
 // PNG returns the QR Code as a PNG image.
 //
 // size is both the image width and height in pixels. If size is too small then
@@ -350,6 +416,46 @@ func (q *QRCode) PNG(size int) ([]byte, error) {
 
 	return b.Bytes(), nil
 }
+
+// SVG returns the QR Code as a SVG image.
+//
+// size is both the image width and height in pixels. If size is too small then
+// a larger image is silently returned. Negative values for size cause a
+// variable sized image to be returned: See the documentation for Image().
+func (q *QRCode) SVG() (string, error) {
+	c := q.Canvas()
+	// import "bytes"
+	buf := new(bytes.Buffer)
+	w := svg.Writer
+
+	w(buf, c)
+	// for debug
+	//c.WriteFile("qrcode_out.svg", svg.Writer)
+	//c.WriteFile("qrcode_out.pdf", pdf.Writer)
+	//c.WriteFile("qrcode_out.eps", eps.Writer)
+	//c.WriteFile("qrcode_out.png", rasterizer.PNGWriter(3.2))
+	return buf.String(), nil
+}
+
+/*
+func (q *QRCode) EPS() (string, error) {
+	c := q.Canvas()
+	buf := new(bytes.Buffer)
+	w := eps.Writer
+
+	w(buf, c)
+	return buf.String(), nil
+}
+
+func (q *QRCode) PDF() (string, error) {
+	c := q.Canvas()
+	buf := new(bytes.Buffer)
+	w := pdf.Writer
+
+	w(buf, c)
+	return buf.String(), nil
+}
+*/
 
 // Write writes the QR Code as a PNG image to io.Writer.
 //
