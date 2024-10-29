@@ -113,12 +113,12 @@ func WriteColorFile(content string, level RecoveryLevel, size int, background,
 
 	q, err := New(content, level)
 
-	q.BackgroundColor = background
-	q.ForegroundColor = foreground
-
 	if err != nil {
 		return err
 	}
+
+	q.BackgroundColor = background
+	q.ForegroundColor = foreground
 
 	return q.WriteFile(size, filename)
 }
