@@ -54,10 +54,12 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"image/draw"
 	"image/png"
 	"io"
 	"io/ioutil"
 	"log"
+	"math"
 	"os"
 
 	bitset "github.com/skip2/go-qrcode/bitset"
@@ -328,6 +330,32 @@ func (q *QRCode) Image(size int) image.Image {
 		}
 	}
 
+	dimension := 4*q.VersionNumber + 17
+	quietZoneModules := (q.symbol.size - dimension) / 2
+	if q.DisableBorder {
+		quietZoneModules = 0
+	}
+
+	modulePx := float64(size) / float64(q.symbol.size)
+
+	finderSizeModules := 7
+	finderSizePx := modulePx * float64(finderSizeModules)
+
+	// Top-left
+	x_tl := float64(quietZoneModules) * modulePx
+	y_tl := float64(quietZoneModules) * modulePx
+	drawRoundedFinder(img, int(x_tl), int(y_tl), int(finderSizePx), q.ForegroundColor, q.BackgroundColor)
+
+	// Top-right
+	x_tr := float64(quietZoneModules+dimension-finderSizeModules) * modulePx
+	y_tr := float64(quietZoneModules) * modulePx
+	drawRoundedFinder(img, int(x_tr), int(y_tr), int(finderSizePx), q.ForegroundColor, q.BackgroundColor)
+
+	// Bottom-left
+	x_bl := float64(quietZoneModules) * modulePx
+	y_bl := float64(quietZoneModules+dimension-finderSizeModules) * modulePx
+	drawRoundedFinder(img, int(x_bl), int(y_bl), int(finderSizePx), q.ForegroundColor, q.BackgroundColor)
+
 	return img
 }
 
@@ -566,6 +594,85 @@ func (q *QRCode) ToString(inverseColor bool) string {
 		buf.WriteString("\n")
 	}
 	return buf.String()
+}
+
+func drawRoundedFinder(img draw.Image, x, y, sizePx int, fg, bg color.Color) {
+	modulePx := float64(sizePx) / 7.0
+
+	// 1. Outer 7x7 rounded rect (fg color)
+	radius_7 := float64(sizePx) * 0.4
+	draw.Draw(img, image.Rect(x, y, x+sizePx, y+sizePx), NewRoundedSquare(sizePx, radius_7, bg), image.Point{}, draw.Src)
+
+	// 2. Inner 5x5 rounded rect (bg color)
+	offset_5 := int(modulePx)
+	size_5 := int(5 * modulePx)
+	radius_5 := radius_7 - modulePx
+	if radius_5 < 0 {
+		radius_5 = 0
+	}
+	draw.Draw(img, image.Rect(x+offset_5, y+offset_5, x+offset_5+size_5, y+offset_5+size_5), NewRoundedSquare(size_5, radius_5, bg), image.Point{}, draw.Src)
+
+	// 3. Center 3x3 rounded square (fg color).
+	offset_3 := int(2 * modulePx)
+	size_3 := int(3 * modulePx)
+	radius_3 := radius_5 - modulePx
+	if radius_3 < 0 {
+		radius_3 = 0
+	}
+	draw.Draw(img, image.Rect(x+offset_3, y+offset_3, x+offset_3+size_3, y+offset_3+size_3), NewRoundedSquare(size_3, radius_3, fg), image.Point{}, draw.Src)
+}
+
+// RoundedSquare is an image.Image that represents a rounded square.
+type RoundedSquare struct {
+	size   int
+	radius float64
+	c      color.Color
+}
+
+// NewRoundedSquare creates a new RoundedSquare.
+func NewRoundedSquare(size int, radius float64, c color.Color) *RoundedSquare {
+	return &RoundedSquare{size: size, radius: radius, c: c}
+}
+
+// ColorModel returns the color model of the image.
+func (rs *RoundedSquare) ColorModel() color.Model {
+	return color.AlphaModel
+}
+
+// Bounds returns the bounds of the image.
+func (rs *RoundedSquare) Bounds() image.Rectangle {
+	return image.Rect(0, 0, rs.size, rs.size)
+}
+
+// At returns the color of the pixel at (x, y).
+func (rs *RoundedSquare) At(x, y int) color.Color {
+	fx, fy, fr := float64(x)+0.5, float64(y)+0.5, rs.radius
+	fs := float64(rs.size)
+
+	if fr > fs/2 {
+		fr = fs / 2
+	}
+
+	// Check if we are in a corner
+	if fx < fr && fy < fr { // Top-left
+		if math.Sqrt(math.Pow(fr-fx, 2)+math.Pow(fr-fy, 2)) > fr {
+			return color.Alpha{0}
+		}
+	} else if fx > fs-fr && fy < fr { // Top-right
+		if math.Sqrt(math.Pow(fx-(fs-fr), 2)+math.Pow(fr-fy, 2)) > fr {
+			return color.Alpha{0}
+		}
+	} else if fx < fr && fy > fs-fr { // Bottom-left
+		if math.Sqrt(math.Pow(fr-fx, 2)+math.Pow(fy-(fs-fr), 2)) > fr {
+			return color.Alpha{0}
+		}
+	} else if fx > fs-fr && fy > fs-fr { // Bottom-right
+		if math.Sqrt(math.Pow(fx-(fs-fr), 2)+math.Pow(fy-(fs-fr), 2)) > fr {
+			return color.Alpha{0}
+		}
+	}
+
+	return rs.c
 }
 
 // ToSmallString produces a multi-line string that forms a QR-code image, a
