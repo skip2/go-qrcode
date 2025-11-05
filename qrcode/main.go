@@ -16,6 +16,7 @@ func main() {
 	outFile := flag.String("o", "", "out PNG file prefix, empty for stdout")
 	size := flag.Int("s", 256, "image size (pixel)")
 	textArt := flag.Bool("t", false, "print as text-art on stdout")
+	small := flag.Bool("small", false, "when -t is used, prints smaller text-art")
 	negative := flag.Bool("i", false, "invert black and white")
 	disableBorder := flag.Bool("d", false, "disable QR Code border")
 	flag.Usage = func() {
@@ -58,7 +59,12 @@ Usage:
 	}
 
 	if *textArt {
-		art := q.ToString(*negative)
+		var art string
+		if *small {
+			art = q.ToSmallString(*negative)
+		} else {
+			art = q.ToString(*negative)
+		}
 		fmt.Println(art)
 		return
 	}
